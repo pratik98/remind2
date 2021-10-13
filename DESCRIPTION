@@ -37,6 +37,7 @@ Imports:
     rmarkdown,
     rmndt,
     scales,
+    stringr,
     tidyr
 Encoding: UTF-8
 License: LGPL-3
