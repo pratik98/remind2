@@ -12,9 +12,9 @@ reportDIETER(dieterDatafile = "report_DIETER.gdx", outputDir = ".")
 \item{outputDir}{path to the output folder, default is current folder.}
 }
 \description{
-*Warning* The function modifies the "REMIND_generic_<scenario>.mif" file by appending the
-additional reporting variables.
+The DIETER data is appended to a REMIND_generic_.mif file and the new mif is saved in different
+location, i.e sub directory "DIETER".
 }
 \author{
-Chen Gong Pratik Agrawal
+Chen Gong, Pratik Agrawal
 }
