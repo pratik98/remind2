@@ -39,10 +39,10 @@ reportDIETER <- function(dieterDatafile = "report_DIETER.gdx", outputDir = ".") 
       dplyr::mutate_all(coalesce, 0) %>%
       dplyr::ungroup(c("model", "variable", "year", "country")) %>%
       dplyr::mutate(Model = .data$model, Scenario = "baseline", Region = .data$country,
-             Hour = .data$hour, Tech =  "all Tech") %>%
+                    Hour = .data$hour, Tech =  "all Tech") %>%
       dplyr::mutate(Variable = .data$variable, Period = .data$year,
-             Year = .data$year,
-             Value = round(.data$value, digits = 4)) %>%
+                    Year = .data$year,
+                    Value = round(.data$value, digits = 4)) %>%
       dplyr::arrange(.data$Period) %>%
       dplyr::select(.data$Model, .data$Scenario, .data$Region, .data$Variable,
                     .data$Year, .data$Period, .data$Tech, .data$Value, .data$Hour)
@@ -65,9 +65,9 @@ reportDIETER <- function(dieterDatafile = "report_DIETER.gdx", outputDir = ".") 
       dplyr::mutate_all(coalesce, 0) %>%
       dplyr::ungroup("model", "tech", "hour", "variable", "country", "year") %>%
       dplyr::mutate(Model = .data$model, Scenario = "baseline",  Region = .data$country,
-             Hour = .data$hour, Year = .data$year, Tech = .data$tech) %>%
+                    Hour = .data$hour, Year = .data$year, Tech = .data$tech) %>%
       dplyr::mutate(Variable = .data$variable, Period = .data$year,
-             Value = round(.data$value, digits = 4)) %>%
+                    Value = round(.data$value, digits = 4)) %>%
 
       dplyr::arrange(.data$Year) %>%
       dplyr::select(.data$Model, .data$Scenario, .data$Region, .data$Variable,
@@ -95,15 +95,15 @@ reportDIETER <- function(dieterDatafile = "report_DIETER.gdx", outputDir = ".") 
     file1 <- datapath(fname = gdxfile)
     outAnnual <- NULL
     ###############################################################################################
-    rep <- read.gdx(gdxName = file1, requestList.name = "report", factors = FALSE, squeeze = FALSE)
+    reportAnnual <- read.gdx(gdxName = file1, requestList.name = "report", factors = FALSE, squeeze = FALSE)
 
-    names(rep) <- c("gdxfile", "model", "year", "country", "variable", "value")
-    out <- rep %>%
+    names(reportAnnual) <- c("gdxfile", "model", "year", "country", "variable", "value")
+    out <- reportAnnual %>%
       dplyr::mutate(Model = .data$model, Scenario = "baseline",
-             Region = .data$country, Year = .data$year, Value = round(.data$value, digits = 4),
-             Tech = "all Tech",
-             Variable = .data$variable,
-             Period = "annual") %>%
+                    Region = .data$country, Year = .data$year, Value = round(.data$value, digits = 4),
+                    Tech = "all Tech",
+                    Variable = .data$variable,
+                    Period = "annual") %>%
       dplyr::arrange(.data$Year) %>%
       dplyr::select(.data$Model, .data$Scenario, .data$Region, .data$Variable,
                     .data$Year, .data$Period, .data$Tech, .data$Value)
@@ -121,10 +121,10 @@ reportDIETER <- function(dieterDatafile = "report_DIETER.gdx", outputDir = ".") 
       dplyr::mutate_all(coalesce, 0) %>%
       dplyr::ungroup(c("model", "tech", "variable", "country", "year")) %>%
       dplyr::mutate(Model = .data$model, Scenario = "baseline",
-             Region = .data$country, Year = .data$year, Value = round(.data$value, digits = 4),
-             Tech = .data$tech,
-             Variable = .data$variable,
-             Period = "annual"
+                    Region = .data$country, Year = .data$year, Value = round(.data$value, digits = 4),
+                    Tech = .data$tech,
+                    Variable = .data$variable,
+                    Period = "annual"
       ) %>%
       dplyr::arrange(.data$Year) %>%
       dplyr::select(.data$Model, .data$Scenario, .data$Region, .data$Variable,
@@ -170,26 +170,26 @@ reportDIETER <- function(dieterDatafile = "report_DIETER.gdx", outputDir = ".") 
 
 
   # technology mapping
-  dieter.tech.mapping <- c(CCGT = "CCGT",
-                           Solar = "Solar",
-                           Wind_on = "Wind",
-                           bio = "Biomass",
-                           OCGT_eff = "OCGT",
-                           ror = "Hydro",
-                           nuc = "Nuclear"
+  dieterTechMapping <- c(CCGT = "CCGT",
+                         Solar = "Solar",
+                         Wind_on = "Wind",
+                         bio = "Biomass",
+                         OCGT_eff = "OCGT",
+                         ror = "Hydro",
+                         nuc = "Nuclear"
   )
 
 
 
-  dieter.tech.mapping.standalone <- c(dieter.tech.mapping,
-                                      lig = "Lignite",
-                                      hc = "Hard coal",
-                                      coal = "Coal (Lig + HC)"
-                                      )
+  dieterTechMappingStandalone <- c(dieterTechMapping,
+                                   lig = "Lignite",
+                                   hc = "Hard coal",
+                                   coal = "Coal (Lig + HC)"
+  )
 
   annualNew$Tech <- as.factor(annualNew$Tech)
   annualRemind <-  annualNew
-  annualNew <- annualNew %>% quitte::revalue.levels(Tech = dieter.tech.mapping.standalone)
+  annualNew <- annualNew %>% quitte::revalue.levels(Tech = dieterTechMappingStandalone)
 
 
   annualNew$Variable <- paste0(gsub("^\\W+|\\W+$", "", annualNew$Variable), "|", annualNew$Tech)
@@ -204,18 +204,18 @@ reportDIETER <- function(dieterDatafile = "report_DIETER.gdx", outputDir = ".") 
   fwrite(annualNew, file.path(outputDir, subFolder, "Dieter_Annual.mif"), append = F, sep = ";", eol = EOL)
   read.quitte(file.path(outputDir, subFolder, "Dieter_Annual.mif")) %>%
     readr::write_rds(paste0(gsub(".mif", "", file.path(outputDir, subFolder, "Dieter_Annual.mif")), ".rds"),
- compress = "xz")
+                     compress = "xz")
 
 
   # append model = 'DIETER' to REMIND-EU mif file
   # then for the switch that appends to the main mif, use coal = "Coal (Lig + HC)",
 
-  dieter.tech.mapping.REMIND <- c(dieter.tech.mapping,
-                                  coal = "Coal (Lig + HC)"
-                                  )
+  dieterTechMappingRemind <- c(dieterTechMapping,
+                               coal = "Coal (Lig + HC)"
+  )
 
   annualRemind <- annualRemind %>% dplyr::filter(.data$Model == "DIETER", .data$Tech != "lig", .data$Tech != "hc")
-  annualRemind <- annualRemind %>% quitte::revalue.levels(Tech = dieter.tech.mapping.REMIND)
+  annualRemind <- annualRemind %>% quitte::revalue.levels(Tech = dieterTechMappingRemind)
 
 
   annualRemind$Variable <- paste0(gsub("^\\W+|\\W+$", "", annualRemind$Variable), "|", annualRemind$Tech)
@@ -234,12 +234,12 @@ reportDIETER <- function(dieterDatafile = "report_DIETER.gdx", outputDir = ".") 
     nameMif <- file.path(outputDir, mifFile)
     stopifnot(is.character(nameMif))
 
-  file.copy(from = nameMif, to = file.path(outputDir, subFolder, mifFile), overwrite = TRUE, recursive = FALSE)
-  fwrite(annualRemind, file.path(outputDir, subFolder, mifFile), append = T, sep = ";", eol = EOL)
+    file.copy(from = nameMif, to = file.path(outputDir, subFolder, mifFile), overwrite = TRUE, recursive = FALSE)
+    fwrite(annualRemind, file.path(outputDir, subFolder, mifFile), append = T, sep = ";", eol = EOL)
 
 
-  read.quitte(file.path(outputDir, subFolder, mifFile)) %>%
-    readr::write_rds(paste0(gsub(".mif", "", file.path(outputDir, subFolder, mifFile)), ".rds"), compress = "xz")
+    read.quitte(file.path(outputDir, subFolder, mifFile)) %>%
+      readr::write_rds(paste0(gsub(".mif", "", file.path(outputDir, subFolder, mifFile)), ".rds"), compress = "xz")
 
   }
   ## Hourly Data
@@ -248,7 +248,7 @@ reportDIETER <- function(dieterDatafile = "report_DIETER.gdx", outputDir = ".") 
 
   hourlyNew <- data.table::dcast(outHourly, ... ~ Year, value.var = "Value")
   hourlyNew$Tech <- as.factor(hourlyNew$Tech)
-  hourlyNew <- hourlyNew %>% quitte::revalue.levels(Tech = dieter.tech.mapping.standalone)
+  hourlyNew <- hourlyNew %>% quitte::revalue.levels(Tech = dieterTechMappingStandalone)
 
   hourlyNew$Variable <- paste0(gsub("^\\W+|\\W+$", "", hourlyNew$Variable), "|", hourlyNew$Tech)
   hourlyNew  <- hourlyNew %>% dplyr::select(-.data$Tech)
